@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Payment Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .payment-form {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 6px rgba(0,0,0,0.1);
+            width: 350px;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        #card-element {
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        button {
+            background: #6772e5;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            width: 100%;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #5469d4;
+        }
+    </style>
+</head>
+<body>
+    <div class="payment-form">
+        <h2>Secure Payment</h2>
+        <form id="payment-form">
+            <div id="card-element"><!-- Stripe Card Input --></div>
+            <button type="submit">Pay $10</button>
+        </form>
+        <div id="payment-result" style="margin-top:10px; text-align:center;"></div>
+    </div>
+
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+        const stripe = Stripe("YOUR_PUBLISHABLE_KEY"); // Replace with your Stripe publishable key
+        const elements = stripe.elements();
+        const card = elements.create("card");
+        card.mount("#card-element");
+
+        const form = document.getElementById("payment-form");
+        const resultDiv = document.getElementById("payment-result");
+
+        form.addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            const { paymentMethod, error } = await stripe.createPaymentMethod({
+                type: 'card',
+                card: card,
+            });
+
+            if (error) {
+                resultDiv.textContent = error.message;
+            } else {
+                resultDiv.textContent = "Payment method created: " + paymentMethod.id;
+                // Send paymentMethod.id to your server to complete the payment
+            }
+        });
+    </script>
+</body>
+</html>
